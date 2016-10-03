@@ -3,12 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.cache.cache_lhm;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+package com.cache.cache_lhm_bf;
 
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -16,6 +13,7 @@ import java.util.Map.Entry;
  */
 public class LRUCache extends LinkedHashMap<String, String>{
     private int capacity;
+    
    
     public LRUCache(int capacity) {
         super(capacity+1, 1.0f, true);  // for access order
@@ -33,8 +31,8 @@ public class LRUCache extends LinkedHashMap<String, String>{
         super.put(key, value);
     }
     
-    @Override
-    protected boolean removeEldestEntry(Entry entry) {
-        return (size() > this.capacity);
-    }
+//    @Override
+//    protected boolean removeEldestEntry(Entry entry) {
+//        return (size() > this.capacity);
+//    }
 }

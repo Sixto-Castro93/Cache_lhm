@@ -35,14 +35,13 @@ public class Cache_lhm {
                 total_access = total_access + 1;
                 String file_id = line.split(args[0])[Integer.parseInt(args[1])];
                 System.out.println(file_id);
+                
                 if (cache.get(file_id) == null){
                     cache.set(file_id, Cache_lhm.value_default);
                 }
                 else{
                     total_hits =  total_hits + 1;
-                    cache.set(file_id, Cache_lhm.value_default);
                 }
-
             }
             
         }else{      //opcion 2 = LRU Cache with Bloom Filter
@@ -54,25 +53,12 @@ public class Cache_lhm {
                 System.out.println(file_id);
 
                 if (cache.get(file_id) == null){
-                    if(cache.bloomFilter.mightContain(file_id)){
-                        cache.set(file_id, Cache_lhm.value_default);
-                        //total_hits =  total_hits + 1;
-                    }
-                    else{
-                        cache.bloomFilter.put(file_id);
-
-                    }
+                    cache.set(file_id, Cache_lhm.value_default);
                 }
                 else{
                     total_hits =  total_hits + 1;
-                    cache.set(file_id, Cache_lhm.value_default);
                 }
-                
-                
-
-
-            }
-        
+            }        
         }
         
         System.out.println(opcion);

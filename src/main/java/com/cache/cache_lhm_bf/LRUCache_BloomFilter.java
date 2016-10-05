@@ -35,7 +35,14 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     }
    
     public void set(String key, String value) {
-        super.put(key, value);
+        if(cache.bloomFilter.mightContain(file_id)){
+            super.put(key, value);
+        } else{
+            // First time we are seing this key
+            // Ignore key but add it to bloom filter 
+            // so that we know that we have already seen it.
+            this.bloomFilter.put(file_id);
+        }
     }
     
     

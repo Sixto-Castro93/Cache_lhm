@@ -6,6 +6,7 @@
 package com.cache.cache_lhm_bf;
 
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  *
@@ -31,8 +32,8 @@ public class LRUCache extends LinkedHashMap<String, String>{
         super.put(key, value);
     }
     
-//    @Override
-//    protected boolean removeEldestEntry(Entry entry) {
-//        return (size() > this.capacity);
-//    }
+    @Override
+    protected boolean removeEldestEntry(Entry entry) {
+        return (size()> this.capacity);
+    }
 }

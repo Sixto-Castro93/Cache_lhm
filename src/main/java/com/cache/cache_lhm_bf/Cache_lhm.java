@@ -19,22 +19,23 @@ public class Cache_lhm {
     private static String value_default = "abcdeabcdeabcdeabacdeabcdeabcdeabcdeabcdeabcdeabcde";
     
     public static void main(String[] args) throws IOException{//args[0]->delimitador..args[1]->columna del id
-                                                              //args[3]->1:LRUCache, 2:LRUCache with Bloom Filter
+                                                              //args[2]->1:LRUCache, 2:LRUCache with Bloom Filter
+                                                              //args[3]-> cache tamaño
         int total_access = 0;
         int total_hits = 0;
-        int capacity = 228177;
+        int capacity = Integer.parseInt(args[3]);//4988059->100%
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        LRUCache_BloomFilter cache_bf;
+        LRUCache cache;
         String line = null;
         String opcion;
-//        int capacity = 5;
         float hit_rate = 0;
         if(Integer.parseInt(args[2]) == 1){     //opcion 1 = LRU Cache
             opcion = "LRU Cache";
-            LRUCache cache = new LRUCache(capacity);
+            cache = new LRUCache(capacity);
             while( (line = input.readLine()) != null ) {   
                 total_access = total_access + 1;
                 String file_id = line.split(args[0])[Integer.parseInt(args[1])];
-                System.out.println(file_id);
                 
                 if (cache.get(file_id) == null){
                     cache.set(file_id, Cache_lhm.value_default);
@@ -46,14 +47,13 @@ public class Cache_lhm {
             
         }else{      //opcion 2 = LRU Cache with Bloom Filter
             opcion = "LRU Cache with Bloom Filter";
-            LRUCache_BloomFilter cache = new LRUCache_BloomFilter(capacity);
+            cache_bf = new LRUCache_BloomFilter(capacity);
             while( (line = input.readLine()) != null ) {   
                 total_access = total_access + 1;
                 String file_id = line.split(args[0])[Integer.parseInt(args[1])];
-                System.out.println(file_id);
-
-                if (cache.get(file_id) == null){
-                    cache.set(file_id, Cache_lhm.value_default);
+                
+                if (cache_bf.get(file_id) == null){
+                    cache_bf.set(file_id, Cache_lhm.value_default);
                 }
                 else{
                     total_hits =  total_hits + 1;
@@ -66,6 +66,8 @@ public class Cache_lhm {
         System.out.printf("Number of hits:  %d \n", total_hits);
         hit_rate = (float)total_hits / total_access;
         System.out.printf("Hit rate %.7f \n", hit_rate);
+        //System.out.println(cache_bf.bloomFilter.expectedFpp());
+       
         
     }
     

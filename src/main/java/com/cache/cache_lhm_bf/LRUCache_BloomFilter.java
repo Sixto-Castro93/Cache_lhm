@@ -9,6 +9,7 @@ import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  *
@@ -17,7 +18,7 @@ import java.util.LinkedHashMap;
 public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     private int capacity;
     double fpp = 0.03; // desired false positive probability
-    int expectedInsertions = 500;
+    int expectedInsertions = 54600645; //500;
     BloomFilter<CharSequence> bloomFilter;
     
     public LRUCache_BloomFilter(int capacity) {
@@ -35,15 +36,20 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     }
    
     public void set(String key, String value) {
-        if(cache.bloomFilter.mightContain(file_id)){
+        if(this.bloomFilter.mightContain(key)){
             super.put(key, value);
         } else{
             // First time we are seing this key
             // Ignore key but add it to bloom filter 
             // so that we know that we have already seen it.
-            this.bloomFilter.put(file_id);
+            this.bloomFilter.put(key);
         }
     }
     
+    
+    @Override
+    protected boolean removeEldestEntry(Entry entry) {
+        return (size()> this.capacity);
+    }
     
 }

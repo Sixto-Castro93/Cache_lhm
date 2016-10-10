@@ -20,10 +20,16 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     double fpp = 0.03; // desired false positive probability
     int expectedInsertions = 54600645; //500;
     BloomFilter<CharSequence> bloomFilter;
+    double p;
     
     public LRUCache_BloomFilter(int capacity) {
+        this(capacity, 0);
+    }
+    
+    public LRUCache_BloomFilter(int capacity, double p) {
         super(capacity+1, 1.0f, true);  // for access order
         this.capacity = capacity;
+        this.p = 0;
         bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), 
             expectedInsertions,fpp);
     }
@@ -43,6 +49,12 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
             // Ignore key but add it to bloom filter 
             // so that we know that we have already seen it.
             this.bloomFilter.put(key);
+            
+            // With some probability p, we will also add the
+            // element to the cache.
+            double sample = rnd.nextDouble();
+            if (sample < p)
+                super(key, value);
         }
     }
     

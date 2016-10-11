@@ -10,6 +10,7 @@ import com.google.common.hash.Funnels;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Random;
 
 /**
  *
@@ -21,15 +22,16 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     int expectedInsertions = 54600645; //500;
     BloomFilter<CharSequence> bloomFilter;
     double p;
+    Random rnd = new Random();
     
     public LRUCache_BloomFilter(int capacity) {
-        this(capacity, 0);
+        this(capacity, 0.0);
     }
     
     public LRUCache_BloomFilter(int capacity, double p) {
         super(capacity+1, 1.0f, true);  // for access order
         this.capacity = capacity;
-        this.p = 0;
+        this.p = p;
         bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), 
             expectedInsertions,fpp);
     }
@@ -42,6 +44,7 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     }
    
     public void set(String key, String value) {
+        double sample;
         if(this.bloomFilter.mightContain(key)){
             super.put(key, value);
         } else{
@@ -52,9 +55,12 @@ public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
             
             // With some probability p, we will also add the
             // element to the cache.
-            double sample = rnd.nextDouble();
-            if (sample < p)
-                super(key, value);
+            sample = rnd.nextDouble();
+            if (sample < p){
+                //System.out.println(sample);
+                super.put(key, value);
+            }
+            
         }
     }
     

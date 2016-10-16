@@ -18,21 +18,27 @@ public class Cache_lhm {
     
     private static String value_default = "abcdeabcdeabcdeabacdeabcdeabcdeabcdeabcdeabcdeabcde";
     
-    public static void main(String[] args) throws IOException{//args[0]->delimitador..args[1]->columna del id
-                                                              //args[2]->1:LRUCache, 2:LRUCache with Bloom Filter
-                                                              //args[3]-> cache tamaño...args[4]-> probability p
+    public static void main(String[] args) throws IOException{//args[0]->delimiter..args[1]->id column
+                                                              //args[2]->1:LRUCache, 2:LRUCacheWithBloomFilter, 3:Segmented Cache
+                                                              //args[3]-> cache capacity
+        int length_args = args.length;                                                      
         int total_access = 0;
         int total_hits = 0;
-        int capacity = Integer.parseInt(args[3]);//4988059->100%
-        double p = Double.parseDouble(args[4]);
+        int replacement_policy = Integer.parseInt(args[2]);
+        int capacity = (int)Double.parseDouble(args[3]);//4988059->100%
+        double p = 0.0;
+        double percentage = 0.0;
+        double percentage2 = 0.0;
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         LRUCache_BloomFilter cache_bf;
+        SegmentedLRUCache segmented_cache;
         LRUCache cache;
         String line = null;
-        String opcion;
+        String option = null;
         float hit_rate = 0;
-        if(Integer.parseInt(args[2]) == 1){     //opcion 1 = LRU Cache
-            opcion = "LRU Cache";
+        
+        if(replacement_policy == 1){     //opcion 1 = LRU Cache 
+            option = "LRU Cache";
             cache = new LRUCache(capacity);
             while( (line = input.readLine()) != null ) {   
                 total_access = total_access + 1;
@@ -46,9 +52,17 @@ public class Cache_lhm {
                 }
             }
             
-        }else{      //opcion 2 = LRU Cache with Bloom Filter
-            opcion = "LRU Cache with Bloom Filter";
-            cache_bf = new LRUCache_BloomFilter(capacity, p);
+        }
+        if(replacement_policy == 2)
+        {      //opcion 2 = LRU Cache with Bloom Filter.....args[4]-> probability p
+            option = "LRU Cache with Bloom Filter";
+            if(length_args == 5){
+                p = Double.parseDouble(args[4]);
+                System.out.println("Probability p: " + p);
+                cache_bf = new LRUCache_BloomFilter(capacity, p);
+            }else
+                cache_bf = new LRUCache_BloomFilter(capacity);
+            
             while( (line = input.readLine()) != null ) {   
                 total_access = total_access + 1;
                 String file_id = line.split(args[0])[Integer.parseInt(args[1])];
@@ -61,14 +75,32 @@ public class Cache_lhm {
                 }
             }        
         }
+        if(replacement_policy == 3){ //opcion 3
+            option = "Segmented LRU Cache";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            segmented_cache = new SegmentedLRUCache(capacity, percentage, percentage2);
+            System.out.println("Principal cache capacity: "+segmented_cache.capacity);
+            System.out.println("First access LRU cache capacity: "+segmented_cache.firstAccessLRU.capacity);
+            while( (line = input.readLine()) != null ) {   
+                total_access = total_access + 1;
+                String file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                
+                if (segmented_cache.get(file_id) == null){
+                    segmented_cache.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+        }
         
-        System.out.println(opcion);
+        System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);
         System.out.printf("Number of hits:  %d \n", total_hits);
         hit_rate = (float)total_hits / total_access;
         System.out.printf("Hit rate %.7f \n", hit_rate);
-        //System.out.println(cache_bf.bloomFilter.expectedFpp());
-       
+        
         
     }
     

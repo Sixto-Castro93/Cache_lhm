@@ -13,7 +13,7 @@ import java.util.Map.Entry;
  * @author cesar17
  */
 public class LRUCache extends LinkedHashMap<String, String>{
-    private int capacity;
+    public int capacity;
     
    
     public LRUCache(int capacity) {

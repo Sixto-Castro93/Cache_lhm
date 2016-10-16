@@ -10,15 +10,17 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author cesar17
+ * @author Sixto
  */
 public class SegmentedLRUCache extends LinkedHashMap<String, String>{
-    private int capacity;
-    // firstAccessLRU
+    public int capacity;
+    LRUCache firstAccessLRU;
    
-    public LRUCache(int capacity) {
-        super(capacity+1, 1.0f, true);  // for access order
-        this.capacity = capacity;
+    public SegmentedLRUCache(int capacity, double percentage, double percentage2) {
+        super((int)((capacity+1)*percentage), 1.0f, true);  // for access order
+        this.capacity = (int)(capacity*percentage); 
+        firstAccessLRU = new LRUCache((int)((capacity+1)*percentage2)); 
+        
     }
    
     public String get(String key) {

@@ -14,7 +14,7 @@ import java.util.Random;
 
 /**
  *
- * @author Sixto
+ * @author Sixto Castro
  */
 public class LRUCache_BloomFilter extends LinkedHashMap<String, String>{
     private int capacity;

@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author Sixto
+ * @author Sixto Castro
  */
 public class SegmentedLRUCache extends LinkedHashMap<String, String>{
     public int capacity;

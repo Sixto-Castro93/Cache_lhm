@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  *
- * @author Sixto
+ * @author Sixto Castro
  */
 public class Cache_lhm {
     
@@ -75,7 +75,7 @@ public class Cache_lhm {
                 }
             }        
         }
-        if(replacement_policy == 3){ //opcion 3
+        if(replacement_policy == 3){ //opcion 3: SLRU
             option = "Segmented LRU Cache";
             percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
             percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity

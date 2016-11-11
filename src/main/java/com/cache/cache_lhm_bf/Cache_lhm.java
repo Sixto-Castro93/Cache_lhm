@@ -32,6 +32,7 @@ public class Cache_lhm {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         LRUCache_BloomFilter cache_bf;
         SegmentedLRUCache segmented_cache;
+        SegmentedLRUCache2 segmented_cache2=null;
         LRUCache cache;
         String line = null;
         String option = null;
@@ -94,13 +95,33 @@ public class Cache_lhm {
                 }
             }
         }
+        if(replacement_policy == 4){ //opcion 4: SLRU
+            option = "Segmented LRU Cache 2";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            segmented_cache2 = new SegmentedLRUCache2(capacity, percentage, percentage2);
+            System.out.println("Principal cache capacity: "+segmented_cache2.capacity);
+            System.out.println("First access LRU cache capacity: "+segmented_cache2.firstAccessLRU.capacity);
+            while( (line = input.readLine()) != null ) {   
+                total_access = total_access + 1;
+                String file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                
+                if (segmented_cache2.get(file_id) == null){
+                    segmented_cache2.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+        }
         
         System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);
         System.out.printf("Number of hits:  %d \n", total_hits);
         hit_rate = (float)total_hits / total_access;
         System.out.printf("Hit rate %.7f \n", hit_rate);
-        
+        System.out.println("first access LRU");
+                
         
     }
     

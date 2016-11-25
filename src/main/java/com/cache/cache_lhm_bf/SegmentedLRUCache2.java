@@ -14,12 +14,14 @@ import java.util.Map.Entry;
  */
 public class SegmentedLRUCache2 extends LinkedHashMap<String, String>{
     public int capacity;
+    public int totalCapacity;
     public LRUCache firstAccessLRU;
    
     public SegmentedLRUCache2(int capacity, double percentage, double percentage2) {
         super((int)((capacity+1)*percentage), 1.0f, true);  // for access order
-        this.capacity = (int)(capacity*percentage); 
-        firstAccessLRU = new LRUCache((int)((capacity+1)*percentage2)); 
+        this.capacity = (int)(capacity*percentage); //Protected cache
+        this.totalCapacity = capacity;//Total cache SLRU
+        firstAccessLRU = new LRUCache((int)((capacity+1)*percentage2)); //Probation cache
         
     }
    
@@ -52,7 +54,7 @@ public class SegmentedLRUCache2 extends LinkedHashMap<String, String>{
         firstAccessLRU.put(eldest.getKey().toString(), eldest.getValue().toString());
         System.out.println(eldest.getKey().toString()+" "+eldest.getValue().toString());*/
         
-        if (size()> this.capacity){
+        if (size()> this.capacity){//2nd Opportunity
             firstAccessLRU.put(entry.getKey().toString(), entry.getValue().toString());
             //System.out.println(entry.getKey().toString()+" "+entry.getValue().toString());
             return true;

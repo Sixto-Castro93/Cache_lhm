@@ -33,6 +33,7 @@ public class Cache_lhm {
         LRUCache_BloomFilter cache_bf;
         SegmentedLRUCache segmented_cache;
         SegmentedLRUCache2 segmented_cache2=null;
+        WTinyLFU wLFU = null;
         LRUCache cache;
         String line = null;
         String option = null;
@@ -113,6 +114,34 @@ public class Cache_lhm {
                     total_hits =  total_hits + 1;
                 }
             }
+//            System.out.println("Lista items en First Access LRU");
+//            for (Map.Entry<String, String> entry : segmented_cache2.firstAccessLRU.entrySet()) {
+//                System.out.println(entry.getKey()+" : "+entry.getValue());
+//            }
+        }
+        if(replacement_policy == 5){ //opcion 5: WTiny LFU
+            option = "WTiny LFU";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            wLFU = new WTinyLFU(capacity, percentage, 0.6, 0.4, percentage2);
+            System.out.println("Main cache capacity: "+(capacity*percentage));
+            System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
+            while( (line = input.readLine()) != null ) {   
+                total_access = total_access + 1;
+                String file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                
+                if (wLFU.get(file_id) == null){
+                    wLFU.increment(file_id);
+                    wLFU.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+//            System.out.println("Lista items en First Access LRU");
+//            for (Map.Entry<String, String> entry : WTinyLFU.slru.firstAccessLRU.entrySet()) {
+//                System.out.println(entry.getKey()+" : "+entry.getValue());
+//            }
         }
         
         System.out.println(option);
@@ -120,7 +149,7 @@ public class Cache_lhm {
         System.out.printf("Number of hits:  %d \n", total_hits);
         hit_rate = (float)total_hits / total_access;
         System.out.printf("Hit rate %.7f \n", hit_rate);
-        System.out.println("first access LRU");
+        
                 
         
     }

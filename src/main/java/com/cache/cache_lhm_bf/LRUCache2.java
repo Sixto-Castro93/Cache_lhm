@@ -37,7 +37,7 @@ public class LRUCache2 extends LinkedHashMap<String, String>{
         if(size()> this.capacity){
             if(WTinyLFU.slru.firstAccessLRU.size() == WTinyLFU.slru.firstAccessLRU.capacity){
             //if(WTinyLFU.data.size()> WTinyLFU.totalCapacity){
-                WTinyLFU.data.remove(entry.getKey().toString());
+                //WTinyLFU.data.remove(entry.getKey().toString());
                 Entry eldestFA= WTinyLFU.slru.firstAccessLRU.entrySet().iterator().next();
                 int freqVictim = WTinyLFU.frequency(eldestFA.getKey().toString());//eldest element from probation cache
                 int freqAdmitted = WTinyLFU.frequency(entry.getKey().toString());//eldest element from window cache

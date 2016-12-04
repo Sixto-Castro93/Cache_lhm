@@ -35,7 +35,7 @@ public final class WTinyLFU {
         this.totalCapacity = capacity;
         this.slru = new SegmentedLRUCache2(mainCacheCapacity, percentPC, percentFA);
         this.windowCache = new LRUCache2(windowCacheCapacity);
-        WTinyLFU.data = new HashMap<>();
+        //WTinyLFU.data = new HashMap<>();
         ensureCapacity(capacity);
     }
     
@@ -67,10 +67,10 @@ public final class WTinyLFU {
     
     public void set(String key, String value) {
         windowCache.put(key, value);
-        if(!data.containsKey(key)){
-            data.put(key, value_default);
-            
-        }
+//        if(!data.containsKey(key)){
+//            data.put(key, value_default);
+//            
+//        }
         
     }
     

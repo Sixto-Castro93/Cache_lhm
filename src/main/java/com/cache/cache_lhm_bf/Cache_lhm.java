@@ -123,7 +123,7 @@ public class Cache_lhm {
             option = "WTiny LFU";
             percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
             percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
-            wLFU = new WTinyLFU(capacity, percentage, 0.6, 0.4, percentage2);
+            wLFU = new WTinyLFU(capacity, percentage, 0.3, 0.7, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
             System.out.println("Main cache capacity: "+(capacity*percentage));
             System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
             while( (line = input.readLine()) != null ) {   

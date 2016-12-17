@@ -182,6 +182,64 @@ public class Cache_lhm {
             System.out.println("Unique keys: " + uniqueKeys.size());
             
         }
+        if(replacement_policy == 7){     
+            option = "Segmented LRU Cache 2 - zipfian";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            segmented_cache2 = new SegmentedLRUCache2(capacity, percentage, percentage2);
+            System.out.println("Principal cache capacity: "+segmented_cache2.capacity);
+            System.out.println("First access LRU cache capacity: "+segmented_cache2.firstAccessLRU.capacity);
+            int num_access=(20*32*capacity)+(capacity*10000);
+            int i=0;
+            while( num_access > 0 ) {
+                num_access--; 
+                i++;
+                total_access = total_access + 1;
+                long rnd = zipf.nextValue();
+                //System.out.println("rand number " +i+ ": "+rnd);
+                uniqueKeys.add(rnd);
+                String file_id = Long.toString(rnd);
+                if (segmented_cache2.get(file_id) == null){
+                    segmented_cache2.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            
+            }
+            
+            System.out.println("Unique keys: " + uniqueKeys.size());
+            
+        }
+        
+        if(replacement_policy == 8){ 
+            option = "WTiny LFU - Zipfian";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            wLFU = new WTinyLFU(capacity, percentage, 0.7, 0.3, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
+            System.out.println("Main cache capacity: "+(capacity*percentage));
+            System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
+            int num_access=(20*32*capacity)+(capacity*10000);
+            int i=0;
+            while( num_access > 0 ) {
+                num_access--; 
+                i++;
+                total_access = total_access + 1;
+                long rnd = zipf.nextValue();
+                //System.out.println("rand number " +i+ ": "+rnd);
+                uniqueKeys.add(rnd);
+                String file_id = Long.toString(rnd);
+                
+                if (wLFU.get(file_id) == null){
+                    wLFU.increment(file_id);
+                    wLFU.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+
+        }
         
         System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);

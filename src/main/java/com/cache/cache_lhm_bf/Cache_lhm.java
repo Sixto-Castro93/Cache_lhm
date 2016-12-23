@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -241,6 +242,53 @@ public class Cache_lhm {
 
         }
         
+        if(replacement_policy == 9){ 
+            option = "WTiny LFU - Zipfian";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            wLFU = new WTinyLFU(capacity, percentage, 0.7, 0.3, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
+            System.out.println("Main cache capacity: "+(capacity*percentage));
+            System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
+            int num_access=(20*32*capacity)+(capacity*10000);//532000000;   
+            System.out.println(num_access);
+            int cont = 0;
+            int cont_malicious=0;
+            double malicious_requests = Double.parseDouble(args[6]);//35466667;//35466666.67; 
+            double percent_malic_req = malicious_requests/num_access;
+            System.out.println(percent_malic_req);
+            int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+            System.out.println(x);
+            long rnd;
+            while( num_access > 0 ) {
+                num_access--; 
+                cont++;
+                total_access = total_access + 1;
+                if((cont % x) == 0){
+                    rnd = ThreadLocalRandom.current().nextLong(0,1000000);
+                    //System.out.println("Malicioso: "+rnd);
+                    cont_malicious++;
+                }
+                else{
+                    rnd = zipf.nextValue();
+                    //System.out.println("zipf: "+rnd);
+                }
+                    
+                uniqueKeys.add(rnd);
+                String file_id = Long.toString(rnd);
+                
+                if (wLFU.get(file_id) == null){
+                    wLFU.increment(file_id);
+                    wLFU.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+            System.out.println("cont_malicious: "+cont_malicious);
+            System.out.println("Unique keys: " + uniqueKeys.size());
+
+        }
+        
         System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);
         System.out.printf("Number of hits:  %d \n", total_hits);
@@ -249,7 +297,8 @@ public class Cache_lhm {
         long warmUpPeriod = 20*32*capacity;
         double warm_hit_rate = (float)(total_hits - warmUpPeriod) / (total_access - warmUpPeriod);
         System.out.printf("Warm hit rate %.7f \n", warm_hit_rate);
-     }   
+     }
+    
                 
         
     

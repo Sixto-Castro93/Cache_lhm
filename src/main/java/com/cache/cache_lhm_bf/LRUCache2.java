@@ -47,7 +47,7 @@ public class LRUCache2 extends LinkedHashMap<String, String>{
                     //System.out.println("Victima tiene mayor freq:"+ " " +eldestFA.getKey().toString());
                     return true;
                 }
-                else{
+                if(freqVictim<freqAdmitted){
                     WTinyLFU.slru.firstAccessLRU.put(entry.getKey().toString(), entry.getValue().toString());
                     //System.out.println("Admitted tiene mayor freq:"+ " " +entry.getKey().toString());
                     return true;

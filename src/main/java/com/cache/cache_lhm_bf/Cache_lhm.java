@@ -45,7 +45,7 @@ public class Cache_lhm {
         HashSet<Long> uniqueKeys = new HashSet<Long>();
         Random rand = new Random();
         int numKeysZipfian = 1000000;
-        double ZipfConf = 0.7;
+        double ZipfConf = 0.9;
         ZipfianGenerator zipf = new ZipfianGenerator(numKeysZipfian, ZipfConf);
 
         
@@ -154,37 +154,85 @@ public class Cache_lhm {
 //            }
         }
         
-        if(replacement_policy == 6){     //opcion 1 = LRU Cache 
+        if(replacement_policy == 6){      
             option = "LRU Cache - zipfian";
             cache = new LRUCache(capacity);
-            //int num_access=30;
+            int cont = 0;
+            int cont_malicious=0;
             int num_access=(20*32*capacity)+(capacity*10000);
-            int i=0;
-            while( num_access > 0 ) {
-                num_access--; 
-                i++;
-                total_access = total_access + 1;
-                long rnd = zipf.nextValue();
-                //System.out.println("rand number " +i+ ": "+rnd);
-                uniqueKeys.add(rnd);
-                String file_id = Long.toString(rnd);
-                if (cache.get(file_id) == null){
-                    cache.set(file_id, Cache_lhm.value_default);
-                }
-                else{
-                    total_hits =  total_hits + 1;
+            double malicious_requests=0.0;
+            int option2;//option2==0->Zipfian Distribution...option2==1-> Zipfian Distribution with malicious requests
+            try{
+                malicious_requests = Double.parseDouble(args[6]);
+                option2=1;
+                
+            }catch(Exception e){
+                option2 = 0;
+            }
+            
+            if(option2 == 0){//"LRU Cache - zipfian"
+                while( num_access > 0 ) {
+                    num_access--; 
+                    total_access = total_access + 1;
+                    long rnd = zipf.nextValue();
+                    //System.out.println("rand number " +i+ ": "+rnd);
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+                    if (cache.get(file_id) == null){
+                        cache.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
                 }
             }
+            else{//"LRU Cache - zipfian with malicious requests"
+                option = option + " with malicious requests";
+                //double malicious_requests = Double.parseDouble(args[6]);//35466667;//35466666.67; 
+                double percent_malic_req = malicious_requests/num_access;
+                System.out.println(percent_malic_req);
+                int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+                System.out.println(x);
+                long rnd;
+                while( num_access > 0 ) {
+                    num_access--; 
+                    cont++;
+                    total_access = total_access + 1;
+                    if((cont % x) == 0){
+                        rnd = ThreadLocalRandom.current().nextLong(0,1000000);
+                        //System.out.println("Malicioso: "+rnd);
+                        cont_malicious++;
+                    }
+                    else{
+                        rnd = zipf.nextValue();
+                        //System.out.println("zipf: "+rnd);
+                    }
+
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+
+                    if (cache.get(file_id) == null){
+                        cache.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
+                }
+            }
+            
             /*System.out.println("unique keys: ");
             Object[] array = uniqueKeys.toArray();
             for (int j = 0; j< array.length; j++) {
                 System.out.println(array[j]);
             }*/
+            System.out.println("cont_malicious: "+cont_malicious);
             System.out.println("Unique keys: " + uniqueKeys.size());
             
         }
         if(replacement_policy == 7){     
             option = "Segmented LRU Cache 2 - zipfian";
+            int cont = 0;
+            int cont_malicious=0;
             percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
             percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
             segmented_cache2 = new SegmentedLRUCache2(capacity, percentage, percentage2);
@@ -192,23 +240,70 @@ public class Cache_lhm {
             System.out.println("First access LRU cache capacity: "+segmented_cache2.firstAccessLRU.capacity);
             int num_access=(20*32*capacity)+(capacity*10000);
             int i=0;
-            while( num_access > 0 ) {
-                num_access--; 
-                i++;
-                total_access = total_access + 1;
-                long rnd = zipf.nextValue();
-                //System.out.println("rand number " +i+ ": "+rnd);
-                uniqueKeys.add(rnd);
-                String file_id = Long.toString(rnd);
-                if (segmented_cache2.get(file_id) == null){
-                    segmented_cache2.set(file_id, Cache_lhm.value_default);
-                }
-                else{
-                    total_hits =  total_hits + 1;
-                }
-            
+            double malicious_requests=0.0;
+            int option2;//option2==0->Zipfian Distribution...option2==1-> Zipfian Distribution with malicious requests
+            try{
+                malicious_requests = Double.parseDouble(args[6]);
+                option2=1;
+                
+            }catch(Exception e){
+                option2 = 0;
             }
             
+            if(option2 == 0){//Segmented LRU Cache 2 - zipfian
+                while( num_access > 0 ) {
+                    num_access--; 
+                    i++;
+                    total_access = total_access + 1;
+                    long rnd = zipf.nextValue();
+                    //System.out.println("rand number " +i+ ": "+rnd);
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+                    if (segmented_cache2.get(file_id) == null){
+                        segmented_cache2.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
+
+                }
+            }
+            else{//Segmented LRU Cache 2 - zipfian with malicious requests
+                option = option + " with malicious requests";
+                //double malicious_requests = Double.parseDouble(args[6]);//35466667;//35466666.67; 
+                double percent_malic_req = malicious_requests/num_access;
+                System.out.println(percent_malic_req);
+                int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+                System.out.println(x);
+                long rnd;
+                while( num_access > 0 ) {
+                    num_access--; 
+                    cont++;
+                    total_access = total_access + 1;
+                    if((cont % x) == 0){
+                        rnd = ThreadLocalRandom.current().nextLong(0,1000000);
+                        //System.out.println("Malicioso: "+rnd);
+                        cont_malicious++;
+                    }
+                    else{
+                        rnd = zipf.nextValue();
+                        //System.out.println("zipf: "+rnd);
+                    }
+
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+
+                    if (segmented_cache2.get(file_id) == null){
+                        segmented_cache2.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
+                }
+            }
+                
+            
+            System.out.println("cont_malicious: "+cont_malicious);
             System.out.println("Unique keys: " + uniqueKeys.size());
             
         }
@@ -222,72 +317,78 @@ public class Cache_lhm {
             System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
             int num_access=(20*32*capacity)+(capacity*10000);
             int i=0;
-            while( num_access > 0 ) {
-                num_access--; 
-                i++;
-                total_access = total_access + 1;
-                long rnd = zipf.nextValue();
-                //System.out.println("rand number " +i+ ": "+rnd);
-                uniqueKeys.add(rnd);
-                String file_id = Long.toString(rnd);
-                
-                if (wLFU.get(file_id) == null){
-                    wLFU.increment(file_id);
-                    wLFU.set(file_id, Cache_lhm.value_default);
-                }
-                else{
-                    total_hits =  total_hits + 1;
-                }
-            }
-
-        }
-        
-        if(replacement_policy == 9){ 
-            option = "WTiny LFU - Zipfian";
-            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
-            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
-            wLFU = new WTinyLFU(capacity, percentage, 0.7, 0.3, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
-            System.out.println("Main cache capacity: "+(capacity*percentage));
-            System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
-            int num_access=(20*32*capacity)+(capacity*10000);//532000000;   
-            System.out.println(num_access);
             int cont = 0;
             int cont_malicious=0;
-            double malicious_requests = Double.parseDouble(args[6]);//35466667;//35466666.67; 
-            double percent_malic_req = malicious_requests/num_access;
-            System.out.println(percent_malic_req);
-            int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
-            System.out.println(x);
-            long rnd;
-            while( num_access > 0 ) {
-                num_access--; 
-                cont++;
-                total_access = total_access + 1;
-                if((cont % x) == 0){
-                    rnd = ThreadLocalRandom.current().nextLong(0,1000000);
-                    //System.out.println("Malicioso: "+rnd);
-                    cont_malicious++;
-                }
-                else{
-                    rnd = zipf.nextValue();
-                    //System.out.println("zipf: "+rnd);
-                }
-                    
-                uniqueKeys.add(rnd);
-                String file_id = Long.toString(rnd);
+            double malicious_requests=0.0;
+            int option2;//option2==0->Zipfian Distribution...option2==1-> Zipfian Distribution with malicious requests
+            try{
+                malicious_requests = Double.parseDouble(args[6]);
+                option2=1;
                 
-                if (wLFU.get(file_id) == null){
-                    wLFU.increment(file_id);
-                    wLFU.set(file_id, Cache_lhm.value_default);
+            }catch(Exception e){
+                option2 = 0;
+            }
+            
+            if(option2 == 0){
+                while( num_access > 0 ) {
+                    num_access--; 
+                    i++;
+                    total_access = total_access + 1;
+                    long rnd = zipf.nextValue();
+                    //System.out.println("rand number " +i+ ": "+rnd);
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+
+                    if (wLFU.get(file_id) == null){
+                        wLFU.increment(file_id);
+                        wLFU.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
                 }
-                else{
-                    total_hits =  total_hits + 1;
+            }
+            else{//"WTiny LFU - Zipfian with malicious requests"
+                option = option + " with malicious requests";
+                //malicious_requests = Double.parseDouble(args[6]);//35466667;//35466666.67; 
+                double percent_malic_req = malicious_requests/num_access;
+                System.out.println(percent_malic_req);
+                int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+                System.out.println(x);
+                long rnd;
+                while( num_access > 0 ) {
+                    num_access--; 
+                    cont++;
+                    total_access = total_access + 1;
+                    if((cont % x) == 0){
+                        rnd = ThreadLocalRandom.current().nextLong(0,1000000);
+                        //System.out.println("Malicioso: "+rnd);
+                        cont_malicious++;
+                    }
+                    else{
+                        rnd = zipf.nextValue();
+                        //System.out.println("zipf: "+rnd);
+                    }
+
+                    uniqueKeys.add(rnd);
+                    String file_id = Long.toString(rnd);
+
+                    if (wLFU.get(file_id) == null){
+                        wLFU.increment(file_id);
+                        wLFU.set(file_id, Cache_lhm.value_default);
+                    }
+                    else{
+                        total_hits =  total_hits + 1;
+                    }
                 }
             }
             System.out.println("cont_malicious: "+cont_malicious);
             System.out.println("Unique keys: " + uniqueKeys.size());
+            
 
         }
+        
+        
         
         System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);

@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author cesar17
+ * @author Sixto Castro
  */
-public class LRUCache2 extends LinkedHashMap<String, String>{
+public class LRUCache2 extends LinkedHashMap<String, String>{//LRU2->Window Cache
     public int capacity;
     
    

@@ -469,7 +469,10 @@ public class Cache_lhm {
                             wLFU.set(file_id, Cache_lhm.value_default);
                         }
                         else{
-                            total_hits =  total_hits + 1;
+                            if(iter==2)
+                                total_hits = total_hits;
+                            else
+                                total_hits =  total_hits + 1;
                         }
                     }
                     flag_malicious = false;
@@ -552,7 +555,10 @@ public class Cache_lhm {
                         cache.set(file_id, Cache_lhm.value_default);
                         }
                         else{
-                            total_hits =  total_hits + 1;
+                            if(iter==2)
+                                total_hits = total_hits;
+                            else
+                                total_hits =  total_hits + 1;
                         }
                     }
                     flag_malicious = false;
@@ -645,8 +651,11 @@ public class Cache_lhm {
                         segmented_cache2.set(file_id, Cache_lhm.value_default);
                         }
                         else{
-                            total_hits =  total_hits + 1;
-                        } 
+                            if(iter==2)
+                                total_hits = total_hits;
+                            else
+                                total_hits =  total_hits + 1;
+                        }
                     }
                     flag_malicious = false;
                     

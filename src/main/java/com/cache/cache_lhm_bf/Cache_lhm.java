@@ -773,8 +773,8 @@ public class Cache_lhm {
 
         }
         
-        if(replacement_policy == 14){ //opcion 14: WTiny LFU_LRU
-            option = "WTiny_LFU with LRU as a main cache";
+        if(replacement_policy == 14){ //opcion 14: WTiny LFU_LRU->using Yahoo Trace and malicious requests
+            option = "WTiny_LFU (LRU-> main cache) using Trace with malicious requests";
             int num_access=54600646;
             int cont = 0;
             int numRequestTrace = 0;
@@ -783,7 +783,7 @@ public class Cache_lhm {
             String file_id="";
             percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
             percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
-            wLFU2 = new WTinyLFU_LRU(capacity, percentage, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
+            wLFU2 = new WTinyLFU_LRU(capacity, percentage, percentage2);
             malicious_requests = Double.parseDouble(args[6]);
             System.out.println("Main cache capacity: "+(capacity*percentage));
             System.out.println("Window cache capacity: "+WTinyLFU_LRU.windowCacheCapacity);
@@ -827,14 +827,171 @@ public class Cache_lhm {
 
         }
         
-       
+        if(replacement_policy == 15){ 
+            option = "WTiny_LFU (SLRU2-> main cache) using Trace with malicious requests";
+            int num_access=54600646;
+            int cont = 0;
+            int numRequestTrace = 0;
+            int cont_malicious=0;
+            double malicious_requests=0.0;
+            String file_id="";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            wLFU = new WTinyLFU(capacity, percentage, 0.7, 0.3, percentage2);//0.3 0.7(protected and first access cache percentage):DreamWork / youtube trace
+                        
+            malicious_requests = Double.parseDouble(args[6]);
+            System.out.println("Main cache capacity: "+(capacity*percentage));
+            System.out.println("Window cache capacity: "+WTinyLFU.windowCacheCapacity);
+            
+            double percent_malic_req = malicious_requests/num_access;
+            System.out.println(percent_malic_req);
+            int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+            System.out.println(x);
+            long rnd=0;
+            while( num_access > 0 ) {
+                num_access--; 
+                cont++;
+                total_access = total_access + 1;
+                if((cont % x) == 0){
+                    file_id = Long.toString(ThreadLocalRandom.current().nextLong(0,1000000));
+                    //System.out.println("Malicioso: "+file_id);
+                    cont_malicious++;
+                }
+                else{
+                    if((line = input.readLine()) != null){
+                        file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                        numRequestTrace++;
+                        //System.out.println("Trace item: "+file_id);
+                    }
+                    
+                }
+
+                
+                if (wLFU.get(file_id) == null){
+                    wLFU.increment(file_id);
+                    wLFU.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+            System.out.println("Pedidos Maliciosos: "+cont_malicious);
+            System.out.println("Peticiones trace: "+numRequestTrace);
+
+        }
+        
+        if(replacement_policy == 16){ 
+            option = "Segmented LRU using Yahoo Trace with malicious requests";
+            int num_access=54600646;
+            int cont = 0;
+            int numRequestTrace = 0;
+            int cont_malicious=0;
+            double malicious_requests=0.0;
+            String file_id="";
+            percentage = Double.parseDouble(args[4]);//args[4]-> percentage of Principal Cache capacity
+            percentage2 = Double.parseDouble(args[5]);//args[5]->percentage of First Access LRU Cache capacity
+            segmented_cache2 = new SegmentedLRUCache2(capacity, percentage, percentage2);
+            
+            System.out.println("Principal cache capacity: "+segmented_cache2.capacity);
+            System.out.println("First access LRU cache capacity: "+segmented_cache2.firstAccessLRU.capacity);
+            malicious_requests = Double.parseDouble(args[6]);
+            
+            
+            double percent_malic_req = malicious_requests/num_access;
+            System.out.println(percent_malic_req);
+            int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+            System.out.println(x);
+            long rnd=0;
+            while( num_access > 0 ) {
+                num_access--; 
+                cont++;
+                total_access = total_access + 1;
+                if((cont % x) == 0){
+                    file_id = Long.toString(ThreadLocalRandom.current().nextLong(0,1000000));
+                    //System.out.println("Malicioso: "+file_id);
+                    cont_malicious++;
+                }
+                else{
+                    if((line = input.readLine()) != null){
+                        file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                        numRequestTrace++;
+                        //System.out.println("Trace item: "+file_id);
+                    }
+                    
+                }
+
+                //uniqueKeys.add(rnd);
+                
+
+                if (segmented_cache2.get(file_id) == null){
+                    segmented_cache2.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+            System.out.println("Pedidos Maliciosos: "+cont_malicious);
+            System.out.println("Peticiones trace: "+numRequestTrace);
+
+        }
+        
+        if(replacement_policy == 17){ 
+            option = "LRU using Yahoo Trace with malicious requests";
+            int num_access=54600646;
+            int cont = 0;
+            int numRequestTrace = 0;
+            int cont_malicious=0;
+            double malicious_requests=0.0;
+            String file_id="";
+            cache = new LRUCache(capacity);
+            System.out.println("Principal cache capacity: "+cache.capacity);
+            malicious_requests = Double.parseDouble(args[6]);
+            
+            
+            double percent_malic_req = malicious_requests/num_access;
+            System.out.println(percent_malic_req);
+            int x = (int) Math.round(1/percent_malic_req);//(int)(1/percent_malic_req); //cada cuanto se envia un pedido malicioso
+            System.out.println(x);
+            long rnd=0;
+            while( num_access > 0 ) {
+                num_access--; 
+                cont++;
+                total_access = total_access + 1;
+                if((cont % x) == 0){
+                    file_id = Long.toString(ThreadLocalRandom.current().nextLong(0,1000000));
+                    //System.out.println("Malicioso: "+file_id);
+                    cont_malicious++;
+                }
+                else{
+                    if((line = input.readLine()) != null){
+                        file_id = line.split(args[0])[Integer.parseInt(args[1])];
+                        numRequestTrace++;
+                        //System.out.println("Trace item: "+file_id);
+                    }
+                    
+                }
+
+                //uniqueKeys.add(rnd);
+                
+
+                if (cache.get(file_id) == null){
+                    cache.set(file_id, Cache_lhm.value_default);
+                }
+                else{
+                    total_hits =  total_hits + 1;
+                }
+            }
+            System.out.println("Pedidos Maliciosos: "+cont_malicious);
+            System.out.println("Peticiones trace: "+numRequestTrace);
+
+        }
         
         System.out.println(option);
         System.out.printf("Number of accessed file:  %d \n", total_access);
         System.out.printf("Number of hits:  %d \n", total_hits);
         hit_rate = (float)  total_hits / total_access;
         System.out.printf("Hit rate %.7f \n", hit_rate);
-        long warmUpPeriod = 20*32*capacity;
+        long warmUpPeriod = 2*capacity;//20*32*capacity;
         System.out.println("warmUpPeriod: "+warmUpPeriod);
         System.out.println("total_hits - warmUpPeriod: "+(total_hits - warmUpPeriod));
         System.out.println("total_access - warmUpPeriod: "+(total_access - warmUpPeriod));

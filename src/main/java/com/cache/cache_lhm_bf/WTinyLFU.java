@@ -37,6 +37,7 @@ public final class WTinyLFU {
         this.windowCache = new LRUCache2(windowCacheCapacity);
         //WTinyLFU.data = new HashMap<>();
         ensureCapacity(capacity);
+        
     }
     
     public String get(String key){

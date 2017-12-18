@@ -76,6 +76,7 @@ public final class WTinyLFU {
     }
     
     public void ensureCapacity(long maximumSize) {
+        //System.out.println("ensureCapacity: "+maximumSize);
     //Caffeine.requireArgument(maximumSize >= 0);
         int maximum = (int) Math.min(maximumSize, Integer.MAX_VALUE >>> 1);
         if ((table != null) && (table.length >= maximum)) {
